@@ -68,7 +68,7 @@ save(ml.ints, hl.ints, file=sf)
 
 # how many proteins in common b/w gold stanard and data?
 unqprots.data = unique(c(rownames(data[[1]][[1]]), rownames(data[[1]][[2]]), rownames(data[[1]][[3]])))
-unqprots.gold = unique(unlist(sapply(gold_standard, strsplit, ";")))
+unqprots.gold = unique(unlist(sapply(gold_standard[[2]], strsplit, ";")))
 n.overlap = length(intersect(unqprots.gold, unqprots.data))
 print(paste(length(unqprots.data),"unique proteins in data"))
 print(paste(length(unqprots.gold),"unique proteins in gold standard"))
@@ -76,7 +76,7 @@ print(paste(n.overlap, " proteins in common"))
 
 # how correlated are true positives? true negatives? random?
 uu = 1 # condition
-mm = 3 # replicate
+mm = 2 # replicate
 
 # pairwise correlation of all proteins
 tmp = data[[uu]][[mm]]
@@ -127,6 +127,52 @@ df2 = data.frame(rr = c(df$rr[I1], df$rr[I0]),
                  group = c(rep(1, length(I1)), rep(0, length(I0))))
 ggplot(df2, aes(x=rr, fill=factor(group))) + geom_density(alpha=.4)
 
+
+
+
+################################ plot well-correlated profiles
+for (uu in 1:2) {
+  for (mm in 1:3) {
+    # pairwise correlation of all proteins
+    tmp = data[[uu]][[mm]]
+    cor.mat = cor(t(tmp), use = "p")
+    rownames(cor.mat) = rownames(tmp)
+    colnames(cor.mat) = rownames(tmp)
+    cor.mat = melt(cor.mat)
+    names(cor.mat) = c("protA","protB","rr")
+    cor.mat$protAB = paste(cor.mat$protA, cor.mat$protB, sep="_")
+    
+    # n samples in common
+    nn = nrow(tmp)
+    n.mat = matrix(rep(NA, nn^2), nrow(tmp), nrow(tmp))
+    for (ii in 1:nn) {
+      print(ii)
+      I1 = !is.na(tmp[ii,])
+      for (jj in 1:nn) {
+        if (ii>=jj) next
+        I2 = !is.na(tmp[jj,])
+        n.mat[ii,jj] = sum(I1 & I2)
+        n.mat[jj,ii] = n.mat[ii,jj]
+      }
+    }
+    rownames(n.mat) = rownames(tmp)
+    colnames(n.mat) = rownames(tmp)
+    n.mat = melt(n.mat)
+    names(n.mat) = c("protA","protB","nn")
+    n.mat$protAB = paste(n.mat$protA, n.mat$protB, sep="_")
+    
+    I = which(n.mat$nn>25 & cor.mat$rr>.9 & cor.mat$rr<1)
+    
+    for (ii in 1:20) {
+      ia = which(rownames(data[[uu]][[mm]]) == n.mat$protA[I[ii]])
+      ib = which(rownames(data[[uu]][[mm]]) == n.mat$protB[I[ii]])
+      df = data.frame(fraction = rep(1:60, 2),
+                      ratio = c(data[[uu]][[mm]][ia,], data[[uu]][[mm]][ib,]),
+                      protein = c(rep(n.mat$protA[I[ii]], 60), rep(n.mat$protB[I[ii]], 60)),
+                      stringsAsFactors = F)
+    }
+  }
+}
 
 
 
