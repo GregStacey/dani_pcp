@@ -7,14 +7,19 @@ require(dplyr)
 
 first = dplyr::first
 
-# # source prince-r
-# tmp = getwd()
-# setwd("/Users/gregstacey/Academics/Foster/PCP-SILAC/Trinary/PrInCE-master/R/")
-# files.sources = list.files()
-# for (ii in 1:length(files.sources)) {
-#   source(files.sources[ii])
-# }
-# setwd(tmp)
+# read command line args
+this.args = commandArgs(trailingOnly = T)
+arg = -1
+if (length(this.args) < 1) {
+  print("Testing all sets...")
+  arg = -1
+} else if (length(this.args) == 1 ){
+  print("Testing one hyperparameter set...")
+  arg = as.integer(as.numeric(this.args))
+  ia = (arg %% 7) + 1
+  ib = ceiling(arg/7)
+}
+
 
 # load data
 fn = "/Users/gregstacey/Academics/Foster/LabMembers/Dani/pcp/data/condition1.csv"
@@ -42,7 +47,7 @@ gs.mapped = sapply(tmp$subunits.UniProt.IDs., strsplit, ";")
 names(gs.mapped) = tmp$ComplexName
 fn = "/Users/gregstacey/Academics/Foster/LabMembers/Dani/pcp/data/allComplexes.txt"
 tmp = as.data.frame(read_tsv(fn))
-gs = sapply(tmp$subunits.UniProt.IDs., strsplit, ";")
+gs = sapply(tmp$`subunits(UniProt IDs)`, strsplit, ";")
 names(gs) = tmp$ComplexName
 gold_standard = list(gs, gs.mapped)
 
@@ -50,13 +55,10 @@ gold_standard = list(gs, gs.mapped)
 reps = list(1, 2, 3, c(1, 2), c(1, 3), c(2, 3), c(1, 2, 3))
 
 # predict
-for (ii in 1:length(gold_standard)) { # mapped or unmapped?
-  for (jj in 1:3) { # replicates
-    ml.ints = PrInCE(data[[1]][[2]], gold_standard, verbose = T, classifier="RF")
-    hl.ints = PrInCE(data[[2]], gold_standard, verbose = T, classifier="NB")
-    sf = paste("")
-  }
-}
+ml.ints = PrInCE(data[[1]][reps[[ia]]], gold_standard[[ib]], verbose = T, classifier="NB")
+hl.ints = PrInCE(data[[2]][reps[[ia]]], gold_standard[[ib]], verbose = T, classifier="NB")
+sf = paste("../data/interactions_reps",ia,"_gs",ib,".Rda", sep="")
+save(ml.ints, hl.ints, file=sf)
 
 
 
