@@ -22,7 +22,7 @@ if (length(this.args) < 1) {
 
 
 # load data
-fn = "/Users/gregstacey/Academics/Foster/LabMembers/Dani/pcp/data/condition1.csv"
+fn = "../data/condition1.csv"
 tmp = as.data.frame(read_csv(fn))
 tmp = tmp[!grepl("__", tmp$protein.ids), ] # remove REV and CON
 #tmp$protein.ids = sapply(sapply(tmp$protein.ids, strsplit, "|", T), "[", 2)
@@ -30,7 +30,7 @@ condition1 = (as.matrix(tmp[,3:ncol(tmp)]))
 rownames(condition1) = tmp$protein.ids
 condition1 = condition1[!is.na(rownames(condition1)),]
 condition1 = list(condition1[tmp$replicate==1,], condition1[tmp$replicate==2,], condition1[tmp$replicate==3,])
-fn = "/Users/gregstacey/Academics/Foster/LabMembers/Dani/pcp/data/condition2.csv"
+fn = "../data/condition2.csv"
 tmp = as.data.frame(read_csv(fn))
 tmp = tmp[!grepl("__", tmp$protein.ids), ] # remove REV and CON
 #tmp$protein.ids = sapply(sapply(tmp$protein.ids, strsplit, "|", T), "[", 2)
@@ -41,11 +41,11 @@ condition2 = list(condition2[tmp$replicate==1,], condition2[tmp$replicate==2,], 
 data = list(condition1, condition2)
 
 # load gold_standard
-fn = "/Users/gregstacey/Academics/Foster/LabMembers/Dani/pcp/data/allComplexesmapped.txt"
+fn = "../data/allComplexesmapped.txt"
 tmp = as.data.frame(read_tsv(fn))
 gs.mapped = sapply(tmp$subunits.UniProt.IDs., strsplit, ";")
 names(gs.mapped) = tmp$ComplexName
-fn = "/Users/gregstacey/Academics/Foster/LabMembers/Dani/pcp/data/allComplexes.txt"
+fn = "../data/allComplexes.txt"
 tmp = as.data.frame(read_tsv(fn))
 gs = sapply(tmp$`subunits(UniProt IDs)`, strsplit, ";")
 names(gs) = tmp$ComplexName
@@ -164,12 +164,14 @@ for (uu in 1:2) {
     I = which(n.mat$nn>25 & cor.mat$rr>.9 & cor.mat$rr<1)
     
     for (ii in 1:20) {
-      ia = which(rownames(data[[uu]][[mm]]) == n.mat$protA[I[ii]])
-      ib = which(rownames(data[[uu]][[mm]]) == n.mat$protB[I[ii]])
+      ia = which(rownames(data[[uu]][[mm]]) == (n.mat$protA[I[ii]]))
+      ib = which(rownames(data[[uu]][[mm]]) == (n.mat$protB[I[ii]]))
       df = data.frame(fraction = rep(1:60, 2),
                       ratio = c(data[[uu]][[mm]][ia,], data[[uu]][[mm]][ib,]),
-                      protein = c(rep(n.mat$protA[I[ii]], 60), rep(n.mat$protB[I[ii]], 60)),
+                      protein = c(rep(as.character(n.mat$protA[I[ii]]), 60), 
+                                  rep(as.character(n.mat$protB[I[ii]]), 60)),
                       stringsAsFactors = F)
+      ggplot(df, aes(x=fraction, y=ratio, color=protein)) + geom_line() + geom_point()
     }
   }
 }
