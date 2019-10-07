@@ -131,6 +131,7 @@ ggplot(df2, aes(x=rr, fill=factor(group))) + geom_density(alpha=.4)
 
 
 ################################ plot well-correlated profiles
+conds = list("ml", "hl")
 for (uu in 1:2) {
   for (mm in 1:3) {
     # pairwise correlation of all proteins
@@ -172,6 +173,9 @@ for (uu in 1:2) {
                                   rep(as.character(n.mat$protB[I[ii]]), 60)),
                       stringsAsFactors = F)
       ggplot(df, aes(x=fraction, y=ratio, color=protein)) + geom_line() + geom_point()
+      sf = paste("../figures/chromatograms/cond",conds[[uu]],"_rep",
+                 mm,"_",n.mat$protA[I[ii]],"_",n.mat$protB[I[ii]],".png", sep="")
+      ggsave(sf, width=6, height=3)
     }
   }
 }
