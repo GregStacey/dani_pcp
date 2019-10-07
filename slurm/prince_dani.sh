@@ -7,7 +7,8 @@
 #SBATCH --mem=16000M
 #SBATCH --array=1-14
 
-module load r/3.4.3
-module load gcc/5.4.0
+module load gcc/7.3.0
+module load nixpkgs/16.09
+module load r/3.6.0
 
 Rscript prince_dani.R $SLURM_ARRAY_TASK_ID
