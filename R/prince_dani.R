@@ -54,6 +54,7 @@ for (ii in 1:length(gold_standard)) { # mapped or unmapped?
   for (jj in 1:3) { # replicates
     ml.ints = PrInCE(data[[1]][[2]], gold_standard, verbose = T, classifier="RF")
     hl.ints = PrInCE(data[[2]], gold_standard, verbose = T, classifier="NB")
+    sf = paste("")
   }
 }
 
