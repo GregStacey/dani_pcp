@@ -12,4 +12,7 @@ module load nixpkgs/16.09
 module load netcdf/4.6.1
 module load r/3.6.0
 
+PROJECT_DIR=~/projects/def-ljfoster/rstacey/dani_pcp/
+cd ${PROJECT_DIR}/python
+
 Rscript prince_dani.R $SLURM_ARRAY_TASK_ID
