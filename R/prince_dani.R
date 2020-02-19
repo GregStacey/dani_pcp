@@ -15,7 +15,7 @@ require(devtools)
 require(modern)
 # bug on line 85 of calculate_autocorrelation.R
 # load corrected function
-setwd("/Users/gregstacey/Academics/Foster/LabMembers/Dani/pcp/R")
+#setwd("/Users/gregstacey/Academics/Foster/LabMembers/Dani/pcp/R")
 source("./calculate_autocorrelation.R")
 first = dplyr::first
 
