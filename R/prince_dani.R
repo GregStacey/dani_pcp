@@ -20,6 +20,7 @@ source("./calculate_autocorrelation.R")
 first = dplyr::first
 
 # load data
+print("loading data")
 fn = "../data/condition1.csv"
 tmp = as.data.frame(read_csv(fn))
 tmp = tmp[!grepl("__", tmp$protein.ids), ] # remove REV and CON
@@ -39,26 +40,31 @@ condition2 = list(condition2[tmp$replicate==1,], condition2[tmp$replicate==2,], 
 data = list(condition1, condition2)
 
 # remove outliers
+print("removing outliers")
 for (ii in 1:length(data)) {
   for (jj in 1:length(data[[ii]])) {
+    print(paste(ii, jj))
     zz = t(detect_outliers(mat=t(data[[ii]][[jj]]), min_pairs=12, method = "pearson"))
     data[[ii]][[jj]][Iremove] = NA
   }
 }
 
 # load gold_standard
+print("loading gold standard")
 fn = "../data/allComplexes.txt"
 tmp = as.data.frame(read_tsv(fn))
 gs = sapply(tmp$`subunits(UniProt IDs)`, strsplit, ";")
 names(gs) = tmp$ComplexName
 
 # predict
+print("running prince")
 ml.ints = PrInCE(data[[1]], gs, verbose = T, classifier="NB")
 hl.ints = PrInCE(data[[2]], gs, verbose = T, classifier="NB")
 sf = paste("../data/interactions_modern.Rda", sep="")
 save(ml.ints, hl.ints, file=sf)
 
 # write good interaction lists
+print("writing interactions")
 sf = "../data/interactions/interactions_modern_ML.txt"
 write_tsv(ml.ints[which(ml.ints$precision>=0.5),], path=sf)
 sf = "../data/interactions/interactions_modern_HL.txt"
