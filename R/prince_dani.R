@@ -49,6 +49,7 @@ for (ii in 1:length(data)) {
     data[[ii]][[jj]][Iremove] = NA
   }
 }
+save(data, "../data/data_modern.Rda")
 
 # load gold_standard
 print("loading gold standard")
