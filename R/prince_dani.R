@@ -16,7 +16,8 @@ require(modern)
 # bug on line 85 of calculate_autocorrelation.R
 # load corrected function
 #setwd("/Users/gregstacey/Academics/Foster/LabMembers/Dani/pcp/R")
-source("./calculate_autocorrelation.R")
+source("./modern/calculate_autocorrelation2.R")
+source("./modern/detect_outliers2.R")
 first = dplyr::first
 
 # load data
@@ -44,7 +45,7 @@ print("removing outliers")
 for (ii in 1:length(data)) {
   for (jj in 1:length(data[[ii]])) {
     print(paste(ii, jj))
-    zz = t(detect_outliers(mat=t(data[[ii]][[jj]]), min_pairs=12, method = "pearson"))
+    zz = t(detect_outliers2(mat=t(data[[ii]][[jj]]), min_pairs=12, method = "pearson"))
     data[[ii]][[jj]][Iremove] = NA
   }
 }

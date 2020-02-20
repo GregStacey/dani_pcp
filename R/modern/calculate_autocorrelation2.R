@@ -26,7 +26,7 @@
 #'   the autocorrelation for each non-missing observation 
 #'   
 #' @export
-calculate_autocorrelation = function(
+calculate_autocorrelation2 = function(
   mat,
   min_pairs = 10,
   method = c("pearson", "kendall", "spearman"),
