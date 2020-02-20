@@ -46,6 +46,7 @@ for (ii in 1:length(data)) {
   for (jj in 1:length(data[[ii]])) {
     print(paste(ii, jj))
     zz = t(detect_outliers2(mat=t(data[[ii]][[jj]]), min_pairs=12, method = "pearson"))
+    Iremove = abs(zz) > 2
     data[[ii]][[jj]][Iremove] = NA
   }
 }
