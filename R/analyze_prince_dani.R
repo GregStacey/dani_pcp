@@ -378,7 +378,6 @@ if (0) {
 
 ################################ # mike's functional analysis
 if (1) {
-  
   # read ontology
   ontology = get_ontology("../data/go-basic.obo")
   # read annotations
@@ -401,8 +400,28 @@ if (1) {
     as_annotation_list("UNIPROT", "GO.ID")
   anns = list(BP = bp, CC = cc, MF = mf)
   # create overall annotation object
-  ann = as_annotation_list(goa, "UNIPROT", "GO.ID")
+  #ann = as_annotation_list(goa, "UNIPROT", "GO.ID")
   
-  df = differential2(ml.ints, hl.ints, anns, ontology)
-
+  df = differential2(ml.ints, hl.ints, anns, ontology, nboot = 1000)
+  
+  # check all interactions are in interactome
+  for (ii in 1:nrow(df)) {
+    tmpml = unlist(strsplit(df$interactions.ml[ii], ";"))
+    tmphl = unlist(strsplit(df$interactions.hl[ii], ";"))
+    if (length(tmpml)>0){
+      for (jj in 1:length(tmpml)) {
+        prots = sort(unlist(strsplit(tmpml[jj], "-")))
+        if (!sum(ml.ints$protein_A ==prots[1] & ml.ints$protein_B==prots[2])==1) error
+      }
+    }
+    if (length(tmphl)>0) {
+      for (jj in 1:length(tmphl)) {
+        prots = sort(unlist(strsplit(tmphl[jj], "-")))
+        if (!sum(hl.ints$protein_A ==prots[1] & hl.ints$protein_B==prots[2])==1) error
+      }
+    }
+  }
+  
+  # write
+  write_tsv(df, path = "../data/dani-differential.txt")
 }
